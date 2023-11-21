@@ -6,17 +6,14 @@ import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.FPSAnimator;
-/**
- *
- * @author Kakugawa
- */
+
 public class Renderer {
     private static GLWindow window = null;
-    public static int screenWidth = 640;  //1280
-    public static int screenHeight = 480 ; //960
+    public static int screenWidth = 1280;  //1280
+    public static int screenHeight = 960; //960
 
-    //Cria a janela de rendeziração do JOGL
-    public static void init(){
+    // Cria a janela de renderização do JOGL
+    public static void init() {
         GLProfile.initSingleton();
         GLProfile profile = GLProfile.get(GLProfile.GL2);
         GLCapabilities caps = new GLCapabilities(profile);
@@ -26,15 +23,15 @@ public class Renderer {
 
         Cena cena = new Cena();
 
-        window.addGLEventListener(cena); //adiciona a Cena a Janela
-        //Habilita o teclado : cena
+        window.addGLEventListener(cena); // Adiciona a Cena à Janela
+        // Habilita o teclado: cena
         window.addKeyListener(new KeyBoard(cena));
 
-        //window.requestFocus();
+        // window.requestFocus();
         FPSAnimator animator = new FPSAnimator(window, 60);
-        animator.start(); //inicia o loop de animação
+        animator.start(); // Inicia o loop de animação
 
-        //encerrar a aplicacao adequadamente
+        // Adiciona um adaptador de janela para tratar eventos de fechamento
         window.addWindowListener(new WindowAdapter() {
             @Override
             public void windowDestroyNotify(WindowEvent e) {
@@ -43,7 +40,10 @@ public class Renderer {
             }
         });
 
-        //window.setFullscreen(true);
+        // Define a janela para tela cheia
+        window.setFullscreen(true);
+
+        // Torna a janela visível
         window.setVisible(true);
     }
 

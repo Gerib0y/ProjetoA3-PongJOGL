@@ -10,7 +10,7 @@ public class KeyBoard implements KeyListener {
 
     public KeyBoard(Cena cena) {
         this.cena = cena;
-        this.velocidade = 0.3f;
+        this.velocidade = 0.5f;
         this.fatorInterpolacao = 0.1f; // Ajuste conforme necessário
     }
 
@@ -30,8 +30,8 @@ public class KeyBoard implements KeyListener {
         }
 
         // Limita a posição nos limites da tela
-        float limiteEsquerdo = -1.0f; // Ajuste conforme necessário
-        float limiteDireito = 1.0f;  // Ajuste conforme necessário
+        float limiteEsquerdo = -1.5f; // Ajuste conforme necessário
+        float limiteDireito = 1.5f;  // Ajuste conforme necessário
         cena.translacao = clamp(destino, limiteEsquerdo, limiteDireito);
 
         // Aplica suavização usando interpolação linear
