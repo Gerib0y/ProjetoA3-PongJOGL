@@ -4,9 +4,6 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.glu.GLU;
-import com.jogamp.opengl.util.awt.TextRenderer;
-
-import java.awt.*;
 import java.util.Random;
 
 public class Cena implements GLEventListener{
@@ -14,22 +11,29 @@ public class Cena implements GLEventListener{
     GLU glu;
     public float translacao = 0;
     double limite = 2*Math.PI;
-    private float cX = 0.0f, cY = 0.0f, rX = 0.1f, rY = 0.1f; // Posições da Bola
-    public int op = 1; // Menu
-    public int mode; // Menu
+    private float cX = 0.0f; // Posição x da bola
+    private float cY = 0.0f; // Posição y da bola
+    private float rX = 0.1f; // Raio x da bola
+    private float rY = 0.1f; // Raio y da bola
 
     // Randomiza a Bola
     private Random random;
     public Cena() {
         random = new Random();
     }
-    private float limiteSuperior = 1.0f, limiteEsquerdo = -1.8f, limiteDireito = 1.8f, limiteInferior = -0.85f; // Limites da Bola na Tela
-    private float velocidadeBola = 0.01f; // Velocidade da Bola
-    private float direcaoBolaX = 0.9f, direcaoBolaY = -0.9f; // Direção da Bola
-    public float plataformaX = 0.0f, plataformaY = -0.99f; // Posição inicial da plataforma
-    private float larguraPlataforma = 0.6f, alturaPlataforma = 0.1f; // Plataforma
-    // Texto
-    private TextRenderer textRenderer;
+    // Limita a Bola
+    private float limiteSuperior = 1.0f;
+    private float limiteEsquerdo = -1.8f;
+    private float limiteDireito = 1.8f;
+    // Velocidade + Direção da Bola
+    private float velocidadeBola = 0.01f;
+    private float direcaoBolaX = 0.9f;// 1.0 para direita, -1.0 para esquerda
+    private float direcaoBolaY = -0.9f;
+    // Colisão com a plataforma
+    private float plataformaX = 0.0f; // Posição inicial da plataforma no eixo X
+    private float plataformaY = -0.9f; // Altura constante da plataforma no eixo Y
+    private float larguraPlataforma = 0.6f; // Largura da plataforma
+    private float alturaPlataforma = 0.1f; // Ajuste conforme necessário
 
     @Override
     public void init(GLAutoDrawable drawable) {
@@ -38,48 +42,31 @@ public class Cena implements GLEventListener{
         //Estabelece as coordenadas do SRU (Sistema de Referencia do Universo)
         xMin = yMin = zMin = -1;
         xMax = yMax = zMax = 1;
-        textRenderer = new TextRenderer(new Font("Fixedsys Regular", Font.BOLD,50));
     }
 
     @Override
     public void display(GLAutoDrawable drawable) {
-        // Obtem o contexto Opengl
+        //obtem o contexto Opengl
         GL2 gl = drawable.getGL().getGL2();
-        // Define a cor da janela (R, G, G, alpha)
+        //define a cor da janela (R, G, G, alpha)
         gl.glClearColor(0, 0, 0, 1);
-        // Limpa a janela com a cor especificada
+        //limpa a janela com a cor especificada
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
-        gl.glLoadIdentity(); // Lê a matriz identidade
+        gl.glLoadIdentity(); //lê a matriz identidade
 
-        switch (op) {
-            case 1:
-                gl.glPushMatrix();
-                desenhaTexto(gl, 630, 900, Color.CYAN, "PONG");
-                desenhaTexto(gl, 50, 600, Color.WHITE, "COMANDOS:");
-                desenhaTexto(gl, 50, 550, Color.WHITE, "As teclas ← e → movem a barra!");
-                desenhaTexto(gl, 50, 500, Color.WHITE, "Aperte S para iniciar!");
-                desenhaTexto(gl, 50, 450, Color.WHITE, "Aperte M para voltar ao menu principal!");
+        // Desenha a plataforma
+        gl.glPushMatrix();
+            gl.glTranslatef(translacao,0.05f, 0);
+            criaRetangulo(gl);
+        gl.glPopMatrix();
 
-                gl.glPopMatrix();
-                break;
-            case 2:
-                // Desenha a Plataforma
-                gl.glPushMatrix();
-                gl.glTranslatef(translacao, 0.05f, 0);
-                criaRetangulo(gl);
-                gl.glPopMatrix();
+        // Desenha a Bola
+        gl.glPushMatrix();
+            gl.glTranslatef(0,0,0);
+            criaBola(gl);
+        gl.glPopMatrix();
 
-                //Desenha a Bola
-                gl.glPushMatrix();
-                gl.glTranslatef(0, 0, 0);
-                criaBola(gl);
-                gl.glPopMatrix();
-                break;
-
-            default:
-
-                break;
-        }
+        gl.glEnd();
 
         gl.glFlush();
 
@@ -88,27 +75,33 @@ public class Cena implements GLEventListener{
 
         float randomIncrement = random.nextFloat() * 0.02f - 0.01f; // Valor aleatório entre -0.01 e 0.01
         cY += (0.01 + randomIncrement) * direcaoBolaY;
+        //cX += (0.01 + randomIncrement) * direcaoBolaX;// Valor constante ajustado conforme necessário
 
         // Verifica colisão com os limites da tela e inverte a direção se necessário
         if (cX - rX < limiteEsquerdo || cX + rX > limiteDireito) {
-            direcaoBolaX = -direcaoBolaX; // Inverte a direção horizontal
+            direcaoBolaX = -1.0f; // Inverte a direção horizontal
         }
         if (cY + rY > limiteSuperior) {
-            direcaoBolaY = -direcaoBolaY; // Inverte a direção vertical
+            direcaoBolaY = -1.0f; // Inverte a direção vertical
         }
+        // Verifica colisão com a plataforma
         if (verificaColisaoBolaComPlataforma()) {
+            // Inverte a direção vertical da bola
             direcaoBolaY = -direcaoBolaY;
+            //direcaoBolaX = -direcaoBolaX;
         }
+
     }
 
     private boolean verificaColisaoBolaComPlataforma() {
-        return (cX + rX > plataformaX - 1.0f  &&
-                //cX - rX < plataformaX + 0.2f &&
-                //cY + rY > plataformaY - alturaPlataforma &&
+        return (cX + rX > plataformaX - larguraPlataforma  &&
+                cX - rX < plataformaX + larguraPlataforma  &&
+                cY + rY > plataformaY - alturaPlataforma &&
                 cY - rY < plataformaY + alturaPlataforma );
     }
 
     @Override
+
     public void reshape(GLAutoDrawable drawable, int x, int y, int width , int height) {
         //obtem o contexto grafico Opengl
         GL2 gl = drawable.getGL().getGL2();
@@ -138,16 +131,6 @@ public class Cena implements GLEventListener{
         gl.glLoadIdentity(); //lê a matriz identidade
         System.out.println("Reshape: " + width + ", " + height);
     }
-
-    public void desenhaTexto(GL2 gl, int xPosicao, int yPosicao, Color cor, String frase){
-        gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_FILL);
-        //Retorna a largura e altura da janela
-        textRenderer.beginRendering(Renderer.screenWidth, Renderer.screenHeight);
-        textRenderer.setColor(cor);
-        textRenderer.draw(frase, xPosicao, yPosicao);
-        textRenderer.endRendering();
-        gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, mode);
-    }
     public void criaRetangulo(GL2 gl){
         gl.glColor3f(0, 1, 1f); // Cor verde
         gl.glBegin(GL2.GL_QUAD_STRIP);
@@ -165,6 +148,8 @@ public class Cena implements GLEventListener{
         }
         gl.glEnd();
     }
+
+
 
     @Override
     public void dispose(GLAutoDrawable drawable) {}

@@ -7,43 +7,32 @@ public class KeyBoard implements KeyListener {
     private Cena cena;
     private float velocidade;
     private float fatorInterpolacao; // Valor entre 0 e 1 para controlar a suavização
+
     public KeyBoard(Cena cena) {
         this.cena = cena;
-        this.velocidade = 0.3f;
-        this.fatorInterpolacao = 0.0f;
+        this.velocidade = 0.5f;
+        this.fatorInterpolacao = 0.1f; // Ajuste conforme necessário
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
         System.out.println("Key pressed: " + e.getKeyCode());
-
         if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
             System.exit(0);
         }
 
         float destino = cena.translacao;
 
-        switch (e.getKeyCode()) {
-            case 151: // Seta direita
-                destino += velocidade;
-                break;
-            case 149: // Seta esquerda
-                destino -= velocidade;
-                break;
-        }
-        switch (e.getKeyChar()){
-            case 'm':
-                cena.op = 1;
-                break;
-            case 's':
-                cena.op = 2;
-                break;
+        if (e.getKeyChar() == 'd' || e.getKeyChar() == 'D' || e.getKeyCode() == 151) {
+            destino += velocidade;
+        } else if (e.getKeyChar() == 'a' || e.getKeyChar() == 'A' || e.getKeyCode() == 149) {
+            destino -= velocidade;
         }
 
-        // Limita a Plataforma na tela
-        float limiteEsquerdo = -1.5f;
-        float limiteDireito = 1.5f;
-        cena.translacao = Math.max(limiteEsquerdo, Math.min(destino, limiteDireito));
+        // Limita a posição nos limites da tela
+        float limiteEsquerdo = -1.5f; // Ajuste conforme necessário
+        float limiteDireito = 1.5f;  // Ajuste conforme necessário
+        cena.translacao = clamp(destino, limiteEsquerdo, limiteDireito);
 
         // Aplica suavização usando interpolação linear
         cena.translacao = lerp(cena.translacao, cena.translacao, fatorInterpolacao);
