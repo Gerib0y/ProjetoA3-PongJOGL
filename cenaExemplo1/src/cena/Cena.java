@@ -9,30 +9,30 @@ import java.awt.*;
 import java.util.Locale;
 
 public class Cena implements GLEventListener{
-    private float aspect;
-    private float xTranslateBall = 0;
-    private float yTranslateBall = 1f;
-    private char xDirection;
-    private char yDirection = 'd';
-    private int toning = GL2.GL_SMOOTH;
-    public int op = 0; // Menu
-    private float gameSpeed = 0.02f;
-    public int mode; // Menu
-    public float userBarMove = 0;
-    private TextRenderer textRenderer;
     private GL2 gl;
     private GLUT glut;
+    private int toning = GL2.GL_SMOOTH;
+    private float aspect;
+    private TextRenderer textRenderer;
+    public int mode; // Menu
+    public int op = 0; // Menu
+    private float bolaX = 0;
+    private float bolaY = 1f;
+    private char direcaoX;
+    private char direcaoY = 'd';
+    private float velocidade = 0.02f;
+    public float moveBarra = 0;
     public int score = 0;
 
     public void resetData() {
-        xTranslateBall = 0;
-        yTranslateBall = 1f;
-        yDirection = 'd';
+        bolaX = 0;
+        bolaY = 1f;
+        direcaoY = 'd';
 
         //isGamePaused = false;
-        //gameFase = 0;
+        op = 0;
 
-        userBarMove = 0;
+        moveBarra = 0;
         score = 0;
         //userLives = 5;
     }
@@ -87,7 +87,6 @@ public class Cena implements GLEventListener{
         gl.glPopMatrix();
         bolaMove();
         desenhaTexto(gl, 25, 900, Color.WHITE, "Score:" + score);
-        op = 1;
     }
 
     public void desenhaTexto(GL2 gl, int xPosicao, int yPosicao, Color cor, String frase){
@@ -101,7 +100,7 @@ public class Cena implements GLEventListener{
     }
     public void criaRetangulo(){
         gl.glPushMatrix();
-            gl.glTranslatef(userBarMove, 0, 0);
+            gl.glTranslatef(moveBarra, 0, 0);
             gl.glBegin(GL2.GL_QUADS);
                 gl.glColor3f(0f, 1f, 1f);
                 gl.glVertex2f(-0.2f, -0.8f);
@@ -116,7 +115,7 @@ public class Cena implements GLEventListener{
     }
     public void criaBola() {
         gl.glPushMatrix();
-        gl.glTranslatef(xTranslateBall, yTranslateBall, 0);
+        gl.glTranslatef(bolaX, bolaY, 0);
         gl.glColor3f(1, 1, 1);
 
         double limit = 2 * Math.PI;
@@ -135,19 +134,19 @@ public class Cena implements GLEventListener{
         gl.glPopMatrix();
     }
 
-    public void randomRunBall() {
+    public void randomBola() {
         double xRandom = -0.8f + Math.random() * 1.6f;
         if (xRandom > 0) {
-            xDirection = 'r';
+            direcaoX = 'r';
         } else {
-            xDirection = 'l';
+            direcaoX = 'l';
         }
-        xTranslateBall = Float.valueOf(String.format(Locale.US, "%.2f", xRandom));
+        bolaX = Float.valueOf(String.format(Locale.US, "%.2f", xRandom));
     }
 
-    public boolean isBallInRangeOfBar(float xTranslatedBallFixed) {
-        float leftBarLimit = Float.valueOf(String.format(Locale.US, "%.1f", userBarMove - 0.2f));
-        float rightBarLimit = Float.valueOf(String.format(Locale.US, "%.1f", userBarMove + 0.2f));
+    public boolean colisaoBolaBarra(float xTranslatedBallFixed) {
+        float leftBarLimit = Float.valueOf(String.format(Locale.US, "%.1f", moveBarra - 0.2f));
+        float rightBarLimit = Float.valueOf(String.format(Locale.US, "%.1f", moveBarra + 0.2f));
 
         if (leftBarLimit <= xTranslatedBallFixed && rightBarLimit >= xTranslatedBallFixed) {
             return true;
@@ -155,14 +154,14 @@ public class Cena implements GLEventListener{
         return false;
     }
 
-    public boolean isObjectInYRange(float xObj, float yObj, float bLimit, float tLimit, float xPoint) {
+    public boolean colisaoBolaY(float xObj, float yObj, float bLimit, float tLimit, float xPoint) {
         if (tLimit >= yObj && bLimit <= yObj && xObj == xPoint) {
             return true;
         }
         return false;
     }
 
-    public boolean isObjectInXRange(float xObj, float heightObj, float lLimit, float rLimit, float tLimit) {
+    public boolean colisaoBolaX(float xObj, float heightObj, float lLimit, float rLimit, float tLimit) {
         if (lLimit <= xObj && rLimit >= xObj && heightObj == tLimit) {
             return true;
         }
@@ -170,49 +169,49 @@ public class Cena implements GLEventListener{
     }
 
     public void bolaMove() {
-        float xTransBallFixed = Float.valueOf(String.format(Locale.US, "%.1f", xTranslateBall));
-        float yTransBallFixed = Float.valueOf(String.format(Locale.US, "%.1f", yTranslateBall));
+        float xTransBallFixed = Float.valueOf(String.format(Locale.US, "%.1f", bolaX));
+        float yTransBallFixed = Float.valueOf(String.format(Locale.US, "%.1f", bolaY));
 
-        if (op == 2 && xDirection == 'l'
-                && isObjectInYRange(xTransBallFixed, yTransBallFixed, -0.1f, 0.5f, 0.2f)) {
-            xDirection = 'r';
+        if (op == 2 && direcaoX == 'l'
+                && colisaoBolaY(xTransBallFixed, yTransBallFixed, -0.1f, 0.5f, 0.2f)) {
+            direcaoX = 'r';
         }
-        if (op == 2 && xDirection == 'r'
-                && isObjectInYRange(xTransBallFixed, yTransBallFixed, -0.1f, 0.5f, -0.2f)) {
-            xDirection = 'l';
-        } else if (xTransBallFixed > -1f && xDirection == 'l') {
-            xTranslateBall -= gameSpeed/2;
-        } else if (xTransBallFixed == -1f && xDirection == 'l') {
-            xDirection = 'r';
-        } else if (xTransBallFixed < 1f && xDirection == 'r') {
-            xTranslateBall += gameSpeed/2;
-        } else if (xTransBallFixed == 1f && xDirection == 'r') {
-            xDirection = 'l';
+        if (op == 2 && direcaoX == 'r'
+                && colisaoBolaY(xTransBallFixed, yTransBallFixed, -0.1f, 0.5f, -0.2f)) {
+            direcaoX = 'l';
+        } else if (xTransBallFixed > -1f && direcaoX == 'l') {
+            bolaX -= velocidade/2;
+        } else if (xTransBallFixed == -1f && direcaoX == 'l') {
+            direcaoX = 'r';
+        } else if (xTransBallFixed < 1f && direcaoX == 'r') {
+            bolaX += velocidade/2;
+        } else if (xTransBallFixed == 1f && direcaoX == 'r') {
+            direcaoX = 'l';
         }
 
-        if (op == 2 && yDirection == 'u'
-                && isObjectInXRange(xTransBallFixed, yTransBallFixed, -0.2f, 0.2f, -0.2f)) {
-            yDirection = 'd';
-        } else if (op == 2 && yDirection == 'd'
-                && isObjectInXRange(xTransBallFixed, yTransBallFixed, -0.2f, 0.2f, 0.6f)) {
-            yDirection = 'u';
-        } else if (yTransBallFixed == -0.7f && yDirection == 'd'
-                && isBallInRangeOfBar(xTransBallFixed)) {
-            yDirection = 'u';
+        if (op == 2 && direcaoY == 'u'
+                && colisaoBolaX(xTransBallFixed, yTransBallFixed, -0.2f, 0.2f, -0.2f)) {
+            direcaoY = 'd';
+        } else if (op == 2 && direcaoY == 'd'
+                && colisaoBolaX(xTransBallFixed, yTransBallFixed, -0.2f, 0.2f, 0.6f)) {
+            direcaoY = 'u';
+        } else if (yTransBallFixed == -0.7f && direcaoY == 'd'
+                && colisaoBolaBarra(xTransBallFixed)) {
+            direcaoY = 'u';
             //lightOn = false;
             toning = toning == GL2.GL_SMOOTH ? GL2.GL_FLAT : GL2.GL_SMOOTH;
             score += 10;
-        } else if (yTransBallFixed < 0.9f && yDirection == 'u') {
-            yTranslateBall += gameSpeed;
-        } else if (yTransBallFixed == 0.9f && yDirection == 'u') {
-            yDirection = 'd';
+        } else if (yTransBallFixed < 0.9f && direcaoY == 'u') {
+            bolaY += velocidade;
+        } else if (yTransBallFixed == 0.9f && direcaoY == 'u') {
+            direcaoY = 'd';
         } else if (yTransBallFixed < -1f) {
-            yTranslateBall = 1f;
-            xTranslateBall = 0;
+            bolaY = 1f;
+            bolaX = 0;
             //userLives--;
-            randomRunBall();
+            randomBola();
         } else {
-            yTranslateBall -= gameSpeed;
+            bolaY -= velocidade;
             //lightOn = true;
             toning = toning == GL2.GL_SMOOTH ? GL2.GL_FLAT : GL2.GL_SMOOTH;
         }
@@ -242,7 +241,7 @@ public class Cena implements GLEventListener{
         gl = drawable.getGL().getGL2();
         //glu = new GLU();
         textRenderer = new TextRenderer(new Font("Fixedsys Regular", Font.BOLD,50));
-        randomRunBall();
+        randomBola();
     }
 
     @Override

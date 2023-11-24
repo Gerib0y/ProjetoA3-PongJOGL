@@ -21,13 +21,13 @@ public abstract class KeyBoard implements KeyListener {
 
         switch (e.getKeyCode()) {
             case KeyEvent.VK_RIGHT:
-                if (cena.userBarMove < 0.8) {
-                    cena.userBarMove = cena.userBarMove + 0.2f;
+                if (cena.moveBarra < 0.8) {
+                    cena.moveBarra = cena.moveBarra + 0.2f;
                 }
                 break;
             case KeyEvent.VK_LEFT:
-                if (cena.userBarMove > -0.8) {
-                    cena.userBarMove = cena.userBarMove - 0.2f;
+                if (cena.moveBarra > -0.8) {
+                    cena.moveBarra = cena.moveBarra - 0.2f;
                 }
                 break;
         }
