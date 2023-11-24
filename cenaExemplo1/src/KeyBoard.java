@@ -41,8 +41,8 @@ public class KeyBoard implements KeyListener {
         }
 
         // Limita a Plataforma na tela
-        float limiteEsquerdo = -1.5f;
-        float limiteDireito = 1.5f;
+        float limiteEsquerdo = -1.6f;
+        float limiteDireito = 1.6f;
         cena.translacao = Math.max(limiteEsquerdo, Math.min(destino, limiteDireito));
 
         // Aplica suavização usando interpolação linear

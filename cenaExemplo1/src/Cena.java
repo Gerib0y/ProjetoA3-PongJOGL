@@ -18,7 +18,6 @@ public class Cena implements GLEventListener{
     private float cX = 0.0f, cY = 0.0f, rX = 0.1f, rY = 0.1f; // Posições da Bola
     public int op = 1; // Menu
     public int mode; // Menu
-
     // Randomiza a Bola
     private Random random;
     public Cena() {
@@ -27,11 +26,13 @@ public class Cena implements GLEventListener{
     private float limiteSuperior = 1.0f, limiteEsquerdo = -1.8f, limiteDireito = 1.8f, limiteInferior = -0.85f; // Limites da Bola na Tela
     private float velocidadeBola = 0.01f; // Velocidade da Bola
     private float direcaoBolaX = 0.9f, direcaoBolaY = -0.9f; // Direção da Bola
-    public float plataformaY = -0.99f; // Posição inicial da plataforma
+    public float plataformaX = 0.0f, plataformaY = -0.99f; // Posição inicial da plataforma
+    private float alturaPlataforma = 0.20f; // Plataforma
     public float userBarMove = 0;
-    // Texto
     private TextRenderer textRenderer;
     private GL2 gl;
+    public int score = 0;
+
 
     @Override
     public void init(GLAutoDrawable drawable) {
@@ -93,6 +94,8 @@ public class Cena implements GLEventListener{
         criaBola(gl);
         gl.glPopMatrix();
         bolaMove();
+        desenhaTexto(gl, 25, 900, Color.WHITE, "Score:" + score);
+        //desenhaTexto(gl, 900, 900, Color.CYAN, "Vidas:" + vidas);
     }
 
     public void desenhaTexto(GL2 gl, int xPosicao, int yPosicao, Color cor, String frase){
@@ -120,8 +123,8 @@ public class Cena implements GLEventListener{
         gl.glPopMatrix();
     }
     public void criaBola(GL2 gl) {
-        gl.glColor3d(1, 1, 1);
         gl.glBegin(GL2.GL_POLYGON);
+            gl.glColor3f(1, 1, 1);
         for (double i = 0; i < limite; i += 0.01) {
             gl.glVertex2d(cX + rX * Math.cos(i), cY + rY * Math.sin(i));
         }
@@ -142,8 +145,35 @@ public class Cena implements GLEventListener{
         if (cY + rY > limiteSuperior) {
             direcaoBolaY = -direcaoBolaY; // Inverte a direção vertical
         }
+        if (verificaColisaoBolaComBarra()) {
+            direcaoBolaY = -direcaoBolaY;
+            score += 10;
+//            if (cY - rY < limiteInferior) {
+//            vidas -= 1;
+//
+//             //Resetar a posição da bola e sua direção;
+//            cX = 0.0f;
+//            cY = 0.0f;
+//            direcaoBolaX = 0.9f;
+//            direcaoBolaY = -0.9f;
+//
+//        }
+        }
     }
 
+    private boolean verificaColisaoBolaComBarra() {
+        // Coordenadas do retângulo criado pela plataforma
+        float plataformaEsquerda = plataformaX - 0.4f / 2;
+        float plataformaDireita = plataformaX + 0.4f / 2;
+        float plataformaTopo = plataformaY + 0.1f;
+        float plataformaBaixo = plataformaY;
+
+        // Verifica a colisão
+        return (cX + rX > plataformaEsquerda &&
+                //cX - rX < plataformaDireita &&
+                cY + rY > plataformaBaixo &&
+                cY - rY < plataformaTopo);
+    }
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width , int height) {
         //obtem o contexto grafico Opengl
