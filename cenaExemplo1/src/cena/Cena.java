@@ -23,6 +23,7 @@ public class Cena implements GLEventListener{
     private float velocidade = 0.02f;
     public float moveBarra = 0;
     public int score = 0;
+    public int vidas = 5;
 
     public void resetData() {
         bolaX = 0;
@@ -34,7 +35,7 @@ public class Cena implements GLEventListener{
 
         moveBarra = 0;
         score = 0;
-        //userLives = 5;
+        vidas = 5;
     }
 
     @Override
@@ -54,8 +55,34 @@ public class Cena implements GLEventListener{
                 break;
             case 1:
                 fase1();
-                break;
+                if (score > 30){
+                    op = 2;
+                }
+                if (vidas < 1){
+                    op = 3;
+                }
 
+                break;
+            case 2:
+                gl.glClearColor(0,0.3f,0.3f,1);
+                gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
+                fase1();
+                gl.glPushMatrix();
+                    obstaculo();
+                gl.glPopMatrix();
+                velocidade += 0.00001f;
+
+                if (vidas < 1){
+                    op = 3;
+                }
+
+                break;
+            case 3:
+                gl.glClearColor(0, 0, 0, 1);
+                gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
+                gameOver();
+
+                break;
             default:
 
                 break;
@@ -74,6 +101,17 @@ public class Cena implements GLEventListener{
         gl.glPopMatrix();
     }
 
+    public boolean gameOver(){
+        if (vidas <= 0) {
+            gl.glPushMatrix();
+            desenhaTexto(gl, 490, 600, Color.RED, "GAME OVER!");
+            desenhaTexto(gl, 400, 450, Color.WHITE, "Seu Score total foi de: " + score);
+            desenhaTexto(gl, 400, 350, Color.WHITE, "Aperte R para recomeçar!");
+            gl.glPopMatrix();
+        }
+        return true;
+    }
+
     public void fase1() {
         // Desenha a Barra
         gl.glPushMatrix();
@@ -87,6 +125,7 @@ public class Cena implements GLEventListener{
         gl.glPopMatrix();
         bolaMove();
         desenhaTexto(gl, 25, 900, Color.WHITE, "Score:" + score);
+        desenhaTexto(gl, 900, 900, Color.WHITE, "Vidas:" + vidas);
     }
 
     public void desenhaTexto(GL2 gl, int xPosicao, int yPosicao, Color cor, String frase){
@@ -98,6 +137,21 @@ public class Cena implements GLEventListener{
         textRenderer.endRendering();
         gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, mode);
     }
+
+    public void obstaculo(){
+        gl.glPushMatrix();
+        gl.glBegin(GL2.GL_TRIANGLES);
+        gl.glColor3f(1, 1, 1);
+        gl.glVertex2f(-0.7f,0.7f );
+        gl.glVertex2f(-0.8f,0.5f);
+        gl.glVertex2f(-0.6f,0.5f);
+        gl.glVertex2f(0.7f, 0.7f);
+        gl.glVertex2f(0.8f,0.5f);
+        gl.glVertex2f(0.6f, 0.5f);
+        gl.glEnd();
+        gl.glPopMatrix();
+    }
+
     public void criaRetangulo(){
         gl.glPushMatrix();
             gl.glTranslatef(moveBarra, 0, 0);
@@ -113,6 +167,7 @@ public class Cena implements GLEventListener{
             gl.glEnd();
         gl.glPopMatrix();
     }
+
     public void criaBola() {
         gl.glPushMatrix();
         gl.glTranslatef(bolaX, bolaY, 0);
@@ -129,6 +184,7 @@ public class Cena implements GLEventListener{
         for (i = 0; i < limit; i += 0.01) {
             gl.glVertex2d(cX + rX * Math.cos(i), cY + rY * Math.sin(i));
         }
+
         gl.glEnd();
 
         gl.glPopMatrix();
@@ -138,9 +194,11 @@ public class Cena implements GLEventListener{
         double xRandom = -0.8f + Math.random() * 1.6f;
         if (xRandom > 0) {
             direcaoX = 'r';
-        } else {
+        }
+        else {
             direcaoX = 'l';
         }
+
         bolaX = Float.valueOf(String.format(Locale.US, "%.2f", xRandom));
     }
 
@@ -151,6 +209,7 @@ public class Cena implements GLEventListener{
         if (leftBarLimit <= xTranslatedBallFixed && rightBarLimit >= xTranslatedBallFixed) {
             return true;
         }
+
         return false;
     }
 
@@ -158,6 +217,7 @@ public class Cena implements GLEventListener{
         if (tLimit >= yObj && bLimit <= yObj && xObj == xPoint) {
             return true;
         }
+
         return false;
     }
 
@@ -165,6 +225,7 @@ public class Cena implements GLEventListener{
         if (lLimit <= xObj && rLimit >= xObj && heightObj == tLimit) {
             return true;
         }
+
         return false;
     }
 
@@ -179,38 +240,48 @@ public class Cena implements GLEventListener{
         if (op == 2 && direcaoX == 'r'
                 && colisaoBolaY(xTransBallFixed, yTransBallFixed, -0.1f, 0.5f, -0.2f)) {
             direcaoX = 'l';
-        } else if (xTransBallFixed > -1f && direcaoX == 'l') {
+        }
+        else if (xTransBallFixed > -1f && direcaoX == 'l') {
             bolaX -= velocidade/2;
-        } else if (xTransBallFixed == -1f && direcaoX == 'l') {
+        }
+        else if (xTransBallFixed == -1f && direcaoX == 'l') {
             direcaoX = 'r';
-        } else if (xTransBallFixed < 1f && direcaoX == 'r') {
+        }
+        else if (xTransBallFixed < 1f && direcaoX == 'r') {
             bolaX += velocidade/2;
-        } else if (xTransBallFixed == 1f && direcaoX == 'r') {
+        }
+        else if (xTransBallFixed == 1f && direcaoX == 'r') {
             direcaoX = 'l';
         }
 
         if (op == 2 && direcaoY == 'u'
                 && colisaoBolaX(xTransBallFixed, yTransBallFixed, -0.2f, 0.2f, -0.2f)) {
             direcaoY = 'd';
-        } else if (op == 2 && direcaoY == 'd'
+        }
+        else if (op == 2 && direcaoY == 'd'
                 && colisaoBolaX(xTransBallFixed, yTransBallFixed, -0.2f, 0.2f, 0.6f)) {
             direcaoY = 'u';
-        } else if (yTransBallFixed == -0.7f && direcaoY == 'd'
+        }
+        else if (yTransBallFixed == -0.7f && direcaoY == 'd'
                 && colisaoBolaBarra(xTransBallFixed)) {
             direcaoY = 'u';
             //lightOn = false;
             toning = toning == GL2.GL_SMOOTH ? GL2.GL_FLAT : GL2.GL_SMOOTH;
             score += 10;
-        } else if (yTransBallFixed < 0.9f && direcaoY == 'u') {
+        }
+        else if (yTransBallFixed < 0.9f && direcaoY == 'u') {
             bolaY += velocidade;
-        } else if (yTransBallFixed == 0.9f && direcaoY == 'u') {
+        }
+        else if (yTransBallFixed == 0.9f && direcaoY == 'u') {
             direcaoY = 'd';
-        } else if (yTransBallFixed < -1f) {
+        }
+        else if (yTransBallFixed < -1f) {
             bolaY = 1f;
             bolaX = 0;
-            //userLives--;
+            vidas--;
             randomBola();
-        } else {
+        }
+        else {
             bolaY -= velocidade;
             //lightOn = true;
             toning = toning == GL2.GL_SMOOTH ? GL2.GL_FLAT : GL2.GL_SMOOTH;
@@ -231,7 +302,6 @@ public class Cena implements GLEventListener{
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity(); //lê a matriz identidade
         gl.glMatrixMode(GL2.GL_MODELVIEW);
-        gl.glLoadIdentity(); //lê a matriz identidade
         System.out.println("Reshape: " + width + ", " + height);
     }
 
@@ -239,7 +309,6 @@ public class Cena implements GLEventListener{
     public void init(GLAutoDrawable drawable) {
         //dados iniciais da cena
         gl = drawable.getGL().getGL2();
-        //glu = new GLU();
         textRenderer = new TextRenderer(new Font("Fixedsys Regular", Font.BOLD,50));
         randomBola();
     }

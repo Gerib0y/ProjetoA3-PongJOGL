@@ -3,8 +3,6 @@ package cena;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
 
-import java.security.Key;
-
 public abstract class KeyBoard implements KeyListener {
     private Cena cena;
     public KeyBoard(Cena cena){
@@ -36,6 +34,10 @@ public abstract class KeyBoard implements KeyListener {
                 cena.op = 0;
                 break;
             case 's':
+                cena.op = 1;
+                break;
+            case 'r':
+                cena.resetData();
                 cena.op = 1;
                 break;
         }
