@@ -10,7 +10,7 @@ import java.util.Locale;
 
 public class Cena implements GLEventListener{
     private GL2 gl;
-    private GLUT glut;
+    //private GLUT glut;
     private int toning = GL2.GL_SMOOTH;
     private float aspect;
     private TextRenderer textRenderer;
@@ -47,7 +47,7 @@ public class Cena implements GLEventListener{
         // Limpa a janela com a cor especificada
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
         gl.glLoadIdentity(); // Lê a matriz identidade
-        glut = new GLUT();
+        //glut = new GLUT();
 
         switch (op) {
             case 0:
@@ -55,7 +55,7 @@ public class Cena implements GLEventListener{
                 break;
             case 1:
                 fase1();
-                if (score > 30){
+                if (score == 40){
                     op = 2;
                 }
                 if (vidas < 1){
@@ -93,21 +93,40 @@ public class Cena implements GLEventListener{
 
     public void menu() {
         gl.glPushMatrix();
-            desenhaTexto(gl, 550, 900, Color.CYAN, "-=PONG=-");
-            desenhaTexto(gl, 50, 600, Color.WHITE, "COMANDOS:");
-            desenhaTexto(gl, 50, 550, Color.WHITE, "As teclas ← e → movem a barra!");
-            desenhaTexto(gl, 50, 500, Color.WHITE, "Aperte S para iniciar!");
-            desenhaTexto(gl, 50, 450, Color.WHITE, "Aperte M para voltar ao menu principal!");
+            desenhaTexto(gl, 550, 670, Color.CYAN, "-=PONG=-");
+            desenhaTexto(gl, 50, 500, Color.WHITE, "COMANDOS:");
+            desenhaTexto(gl, 50, 450, Color.WHITE, "As teclas ← e → movem a barra!");
+            desenhaTexto(gl, 50, 400, Color.WHITE, "Aperte M para voltar ao MENU PRINCIPAl!");
+            desenhaTexto(gl, 50, 350, Color.WHITE, "Aperte R para RECOMEÇAR!");
+            desenhaTexto(gl, 410, 150, Color.GREEN, "Aperte S para INICIAR!");
         gl.glPopMatrix();
+        gl.glLineWidth(10.0f);
+        gl.glColor3f(0f, 1f, 1f);
+        gl.glBegin(GL2.GL_LINE_LOOP);
+        gl.glVertex2f(-1f, -0.9999f);
+        gl.glVertex2f(1, -1);
+        gl.glVertex2f(1, 1);
+        gl.glVertex2f(-0.9999f, 1);
+        gl.glEnd();
     }
 
     public boolean gameOver(){
         if (vidas <= 0) {
             gl.glPushMatrix();
-            desenhaTexto(gl, 490, 600, Color.RED, "GAME OVER!");
-            desenhaTexto(gl, 400, 450, Color.WHITE, "Seu Score total foi de: " + score);
-            desenhaTexto(gl, 400, 350, Color.WHITE, "Aperte R para recomeçar!");
+                desenhaTexto(gl, 500, 600, Color.RED, "GAME OVER!");
+                desenhaTexto(gl, 320, 450, Color.WHITE, "Seu Score total foi de: " + score);
+                desenhaTexto(gl, 320, 350, Color.WHITE, "Aperte R para RECOMEÇAR!");
+                desenhaTexto(gl, 320, 300, Color.WHITE, "Aperte M para voltar ao MENU!");
             gl.glPopMatrix();
+            gl.glPopMatrix();
+            gl.glLineWidth(10.0f);
+            gl.glColor3f(1f, 0f, 0f);
+            gl.glBegin(GL2.GL_LINE_LOOP);
+            gl.glVertex2f(-1f, -0.9999f);
+            gl.glVertex2f(1, -1);
+            gl.glVertex2f(1, 1);
+            gl.glVertex2f(-0.9999f, 1);
+            gl.glEnd();
         }
         return true;
     }
@@ -124,8 +143,8 @@ public class Cena implements GLEventListener{
         criaBola();
         gl.glPopMatrix();
         bolaMove();
-        desenhaTexto(gl, 25, 900, Color.WHITE, "Score:" + score);
-        desenhaTexto(gl, 900, 900, Color.WHITE, "Vidas:" + vidas);
+        desenhaTexto(gl, 20, 670, Color.WHITE, "Score:" + score);
+        desenhaTexto(gl, 900, 670, Color.WHITE, "Vidas:" + vidas);
     }
 
     public void desenhaTexto(GL2 gl, int xPosicao, int yPosicao, Color cor, String frase){
@@ -233,15 +252,17 @@ public class Cena implements GLEventListener{
         float xTransBallFixed = Float.valueOf(String.format(Locale.US, "%.1f", bolaX));
         float yTransBallFixed = Float.valueOf(String.format(Locale.US, "%.1f", bolaY));
 
-        if (op == 2 && direcaoX == 'l'
-                && colisaoBolaY(xTransBallFixed, yTransBallFixed, -0.1f, 0.5f, 0.2f)) {
-            direcaoX = 'r';
-        }
-        if (op == 2 && direcaoX == 'r'
-                && colisaoBolaY(xTransBallFixed, yTransBallFixed, -0.1f, 0.5f, -0.2f)) {
-            direcaoX = 'l';
-        }
-        else if (xTransBallFixed > -1f && direcaoX == 'l') {
+        // Colisão com objeto da fase 2
+//        if (op == 2 && direcaoX == 'l'
+//                && colisaoBolaY(xTransBallFixed, yTransBallFixed, -0.1f, 0.5f, 0.2f)) {
+//            direcaoX = 'r';
+//        }
+//        if (op == 2 && direcaoX == 'r'
+//                && colisaoBolaY(xTransBallFixed, yTransBallFixed, -0.1f, 0.5f, -0.2f)) {
+//            direcaoX = 'l';
+//        }
+        // Colisão com a plataforma
+        if (xTransBallFixed > -1f && direcaoX == 'l') {
             bolaX -= velocidade/2;
         }
         else if (xTransBallFixed == -1f && direcaoX == 'l') {
@@ -254,15 +275,17 @@ public class Cena implements GLEventListener{
             direcaoX = 'l';
         }
 
-        if (op == 2 && direcaoY == 'u'
-                && colisaoBolaX(xTransBallFixed, yTransBallFixed, -0.2f, 0.2f, -0.2f)) {
-            direcaoY = 'd';
-        }
-        else if (op == 2 && direcaoY == 'd'
-                && colisaoBolaX(xTransBallFixed, yTransBallFixed, -0.2f, 0.2f, 0.6f)) {
-            direcaoY = 'u';
-        }
-        else if (yTransBallFixed == -0.7f && direcaoY == 'd'
+        // Colisão com objeto da fase 2
+//        if (op == 2 && direcaoY == 'u'
+//                && colisaoBolaX(xTransBallFixed, yTransBallFixed, -0.2f, 0.2f, -0.2f)) {
+//            direcaoY = 'd';
+//        }
+//        else if (op == 2 && direcaoY == 'd'
+//                && colisaoBolaX(xTransBallFixed, yTransBallFixed, -0.2f, 0.2f, 0.6f)) {
+//            direcaoY = 'u';
+//        }
+        // Colisão com a plataforma
+        if (yTransBallFixed == -0.7f && direcaoY == 'd'
                 && colisaoBolaBarra(xTransBallFixed)) {
             direcaoY = 'u';
             //lightOn = false;

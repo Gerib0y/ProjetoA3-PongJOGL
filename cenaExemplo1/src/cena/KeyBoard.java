@@ -31,6 +31,7 @@ public abstract class KeyBoard implements KeyListener {
         }
         switch (e.getKeyChar()){
             case 'm':
+                cena.resetData();
                 cena.op = 0;
                 break;
             case 's':
