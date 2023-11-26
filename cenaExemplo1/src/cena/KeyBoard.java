@@ -35,12 +35,22 @@ public abstract class KeyBoard implements KeyListener {
                 cena.op = 0;
                 break;
             case 's':
-                cena.op = 1;
+                if (cena.op != 4 && cena.op != 3) {
+                    cena.op = 1;
+                }
                 break;
             case 'r':
-                cena.resetData();
-                cena.op = 1;
+                if (cena.op !=0 && cena.op != 4) {
+                    cena.resetData();
+                    cena.op = 1;
+                }
                 break;
+            case '1':
+                if (cena.op == 0) {
+                cena.op = 4;
+            }
+            break;
+
         }
     }
 

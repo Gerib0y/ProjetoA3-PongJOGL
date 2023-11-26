@@ -83,6 +83,10 @@ public class Cena implements GLEventListener{
                 gameOver();
 
                 break;
+            case 4:
+                comandos();
+
+                break;
             default:
 
                 break;
@@ -93,12 +97,10 @@ public class Cena implements GLEventListener{
 
     public void menu() {
         gl.glPushMatrix();
-            desenhaTexto(gl, 550, 670, Color.CYAN, "-=PONG=-");
-            desenhaTexto(gl, 50, 500, Color.WHITE, "COMANDOS:");
-            desenhaTexto(gl, 50, 450, Color.WHITE, "As teclas ← e → movem a barra!");
-            desenhaTexto(gl, 50, 400, Color.WHITE, "Aperte M para voltar ao MENU PRINCIPAl!");
-            desenhaTexto(gl, 50, 350, Color.WHITE, "Aperte R para RECOMEÇAR!");
-            desenhaTexto(gl, 410, 150, Color.GREEN, "Aperte S para INICIAR!");
+            desenhaTextoEspecifico(gl, 500, 650, Color.CYAN, "-=PONG=-",60);
+            desenhaTexto(gl, 50, 450, Color.WHITE, "Aperte 1 para saber COMO JOGAR");
+            desenhaTexto(gl, 50, 350, Color.WHITE, "Aperte 2 para acessar os CRÉDITOS");
+            desenhaTextoEspecifico(gl, 410, 150, Color.GREEN, "Aperte S para INICIAR!", 50);
         gl.glPopMatrix();
         gl.glLineWidth(10.0f);
         gl.glColor3f(0f, 1f, 1f);
@@ -108,6 +110,16 @@ public class Cena implements GLEventListener{
         gl.glVertex2f(1, 1);
         gl.glVertex2f(-0.9999f, 1);
         gl.glEnd();
+    }
+
+    public void comandos() {
+        gl.glPushMatrix();
+        desenhaTextoEspecifico(gl, 450, 650, Color.WHITE, "COMO JOGAR", 60);
+            desenhaTexto(gl, 50, 450, Color.WHITE, "← - Move a barra para esquerda");
+            desenhaTexto(gl, 50, 400, Color.WHITE, "→ - Move a barra para direita");
+            desenhaTexto(gl, 50, 350, Color.WHITE, "R - Recomeça o JOGO");
+            desenhaTextoEspecifico(gl, 50, 150, Color.CYAN, "Aperte M para voltar ao MENU PRINCIPAl!", 50);
+        gl.glPopMatrix();
     }
 
     public boolean gameOver(){
@@ -160,13 +172,13 @@ public class Cena implements GLEventListener{
     public void obstaculo(){
         gl.glPushMatrix();
         gl.glBegin(GL2.GL_TRIANGLES);
-        gl.glColor3f(1, 1, 1);
-        gl.glVertex2f(-0.7f,0.7f );
-        gl.glVertex2f(-0.8f,0.5f);
-        gl.glVertex2f(-0.6f,0.5f);
-        gl.glVertex2f(0.7f, 0.7f);
-        gl.glVertex2f(0.8f,0.5f);
-        gl.glVertex2f(0.6f, 0.5f);
+            gl.glColor3f(1, 1, 1);
+            gl.glVertex2f(-0.7f,0.7f );
+            gl.glVertex2f(-0.8f,0.5f);
+            gl.glVertex2f(-0.6f,0.5f);
+            gl.glVertex2f(0.7f, 0.7f);
+            gl.glVertex2f(0.8f,0.5f);
+            gl.glVertex2f(0.6f, 0.5f);
         gl.glEnd();
         gl.glPopMatrix();
     }
@@ -190,7 +202,7 @@ public class Cena implements GLEventListener{
     public void criaBola() {
         gl.glPushMatrix();
         gl.glTranslatef(bolaX, bolaY, 0);
-        gl.glColor3f(1, 1, 1);
+        //gl.glColor3f(1, 1, 1);
 
         double limit = 2 * Math.PI;
         double i;
@@ -201,7 +213,18 @@ public class Cena implements GLEventListener{
 
         gl.glBegin(GL2.GL_POLYGON);
         for (i = 0; i < limit; i += 0.01) {
-            gl.glVertex2d(cX + rX * Math.cos(i), cY + rY * Math.sin(i));
+            double x = cX + rX * Math.cos(i);
+            double y = cY + rY * Math.sin(i);
+
+            // Calcula a cor com base na posição do vértice
+            if (i < Math.PI) {
+                gl.glColor3f(0.09f, 0.09f, 0.09f); // Vértices na metade superior
+            } else {
+                gl.glColor3f(0.9f, 0.9f, 0.9f); // Vértices na metade inferior
+            }
+
+            // Adiciona o vértice ao polígono
+            gl.glVertex2d(x, y);
         }
 
         gl.glEnd();
@@ -328,11 +351,22 @@ public class Cena implements GLEventListener{
         System.out.println("Reshape: " + width + ", " + height);
     }
 
+    // Funçao para mudar tamanho de TEXTO ESPECÍFICOS
+    public void desenhaTextoEspecifico(GL2 gl, int xPosicao, int yPosicao, Color cor, String frase, int tamanhoFonte) {
+        gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_FILL);
+        TextRenderer textRendererEspecifico = new TextRenderer(new Font("Fixedsys Regular", Font.BOLD, tamanhoFonte));
+        textRendererEspecifico.beginRendering(Renderer.screenWidth, Renderer.screenHeight);
+        textRendererEspecifico.setColor(cor);
+        textRendererEspecifico.draw(frase, xPosicao, yPosicao);
+        textRendererEspecifico.endRendering();
+        gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, mode);
+    }
+
     @Override
     public void init(GLAutoDrawable drawable) {
         //dados iniciais da cena
         gl = drawable.getGL().getGL2();
-        textRenderer = new TextRenderer(new Font("Fixedsys Regular", Font.BOLD,50));
+        textRenderer = new TextRenderer(new Font("Fixedsys Regular", Font.BOLD,30));
         randomBola();
     }
 
