@@ -3,7 +3,6 @@ package cena;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
-import com.jogamp.opengl.util.gl2.GLUT;
 import com.jogamp.opengl.util.awt.TextRenderer;
 import java.awt.*;
 import java.util.Locale;
@@ -149,14 +148,18 @@ public class Cena implements GLEventListener{
         criaRetangulo();
         gl.glPopMatrix();
 
+        gl.glPushMatrix();
+        criaVida();
+        gl.glPopMatrix();
+
         // Desenha a Bola
         gl.glPushMatrix();
         gl.glTranslatef(0, 0, 0);
         criaBola();
         gl.glPopMatrix();
         bolaMove();
-        desenhaTexto(gl, 20, 670, Color.WHITE, "Score:" + score);
-        desenhaTexto(gl, 900, 670, Color.WHITE, "Vidas:" + vidas);
+        desenhaTexto(gl, 900, 670, Color.WHITE, "Almas " + score);
+        //desenhaTexto(gl, 20, 670, Color.WHITE, "Vidas:" + vidas);
     }
 
     public void desenhaTexto(GL2 gl, int xPosicao, int yPosicao, Color cor, String frase){
@@ -202,7 +205,6 @@ public class Cena implements GLEventListener{
     public void criaBola() {
         gl.glPushMatrix();
         gl.glTranslatef(bolaX, bolaY, 0);
-        //gl.glColor3f(1, 1, 1);
 
         double limit = 2 * Math.PI;
         double i;
@@ -215,21 +217,37 @@ public class Cena implements GLEventListener{
         for (i = 0; i < limit; i += 0.01) {
             double x = cX + rX * Math.cos(i);
             double y = cY + rY * Math.sin(i);
-
-            // Calcula a cor com base na posição do vértice
-            if (i < Math.PI) {
-                gl.glColor3f(0.09f, 0.09f, 0.09f); // Vértices na metade superior
-            } else {
-                gl.glColor3f(0.9f, 0.9f, 0.9f); // Vértices na metade inferior
-            }
-
-            // Adiciona o vértice ao polígono
+            gl.glColor3f(0f, 0f, 0f);
             gl.glVertex2d(x, y);
         }
+        gl.glEnd();
 
+        // Contorno Laranja
+        gl.glColor3f(1.0f, 0.5f, 0.0f);
+        gl.glBegin(GL2.GL_LINE_LOOP);
+        for (i = 0; i < limit; i += 0.01) {
+            double x = cX + rX * Math.cos(i);
+            double y = cY + rY * Math.sin(i);
+            gl.glVertex2d(x, y);
+        }
         gl.glEnd();
 
         gl.glPopMatrix();
+    }
+
+    public void criaVida(){
+        for (int j = 0; j < vidas; j++) {
+            gl.glBegin(GL2.GL_QUADS);
+            gl.glColor3f(0.255f,0,0);
+                gl.glVertex2f(-1, 0.95f);
+                gl.glVertex2f(-1, 0.85f);
+                gl.glVertex2f(-0.9f,0.85f);
+                gl.glVertex2f(-0.9f,0.95f);
+            gl.glEnd();
+
+            // Move para a próxima posição de vida
+            gl.glTranslatef(0.1f, 0, 0);
+        }
     }
 
     public void randomBola() {
