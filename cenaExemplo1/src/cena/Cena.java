@@ -94,13 +94,13 @@ public class Cena implements GLEventListener{
 
     public void menu() {
         gl.glPushMatrix();
-            desenhaTextoEspecifico(gl, 500, 650, Color.CYAN, "-=PONG=-",60);
-            desenhaTexto(gl, 50, 450, Color.WHITE, "Aperte 1 para saber COMO JOGAR");
-            desenhaTexto(gl, 50, 350, Color.WHITE, "Aperte 2 para acessar os CRÉDITOS");
-            desenhaTextoEspecifico(gl, 410, 150, Color.GREEN, "Aperte S para INICIAR!", 50);
+            desenhaTextoEspecifico(gl, 360, 360, Color.WHITE, "Pong Souls",110);
+            desenhaTexto(gl, 560, 200, Color.WHITE, "1 - COMO JOGAR");
+            desenhaTexto(gl, 560, 150, Color.WHITE, "2 - CRÉDITOS");
+            desenhaTexto(gl, 540, 50, Color.WHITE, "Aperte S para INICIAR!");
         gl.glPopMatrix();
             gl.glLineWidth(10.0f);
-            gl.glColor3f(0f, 1f, 1f);
+            gl.glColor3f(1f, 1f, 1f);
             gl.glBegin(GL2.GL_LINE_LOOP);
             gl.glVertex2f(-1f, -0.9999f);
             gl.glVertex2f(1, -1);
@@ -111,21 +111,24 @@ public class Cena implements GLEventListener{
 
     public void comandos() {
         gl.glPushMatrix();
-        desenhaTextoEspecifico(gl, 450, 650, Color.WHITE, "COMO JOGAR", 60);
-            desenhaTexto(gl, 50, 450, Color.WHITE, "← - Move a barra para esquerda");
-            desenhaTexto(gl, 50, 400, Color.WHITE, "→ - Move a barra para direita");
-            desenhaTexto(gl, 50, 350, Color.WHITE, "R - Recomeça o JOGO");
-            desenhaTextoEspecifico(gl, 50, 150, Color.CYAN, "Aperte M para voltar ao MENU PRINCIPAl!", 50);
+            desenhaTextoEspecifico(gl, 380, 650, Color.WHITE, "COMO JOGAR", 80);
+            desenhaTexto(gl, 50, 500, Color.WHITE, "← - MOVE A BARRA PARA A ESQUERDA");
+            desenhaTexto(gl, 50, 450, Color.WHITE, "→ - MOVE A BARRA PARA A DIREITA");
+            desenhaTexto(gl, 50, 400, Color.WHITE, "R - RECOMEÇA O JOGO");
+            desenhaTexto(gl, 50, 350, Color.WHITE, "A BARRA              REPRESENTA 5 VIDAS,");
+            desenhaTexto(gl, 50, 300, Color.WHITE, "QUANDO ELA CHEGA AO FINAL O JOGO");
+            desenhaTexto(gl, 50, 250, Color.WHITE, "ACABA");
+            desenhaTexto(gl, 50, 20, Color.WHITE, "M - PARA VOLTAR AO MENU");
         gl.glPopMatrix();
     }
 
     public boolean gameOver(){
         if (vidas <= 0) {
             gl.glPushMatrix();
-                desenhaTexto(gl, 500, 600, Color.RED, "GAME OVER!");
-                desenhaTexto(gl, 320, 450, Color.WHITE, "Seu Score total foi de: " + score);
-                desenhaTexto(gl, 320, 350, Color.WHITE, "Aperte R para RECOMEÇAR!");
-                desenhaTexto(gl, 320, 300, Color.WHITE, "Aperte M para voltar ao MENU!");
+                desenhaTextoEspecifico(gl, 380, 400, Color.RED, "VOCÊ PERDEU", 80);
+                desenhaTexto(gl, 500, 300, Color.WHITE, "Seu Score total foi de: " + score);
+                desenhaTexto(gl, 500, 250, Color.WHITE, "Aperte R para RECOMEÇAR!");
+                desenhaTexto(gl, 500, 200, Color.WHITE, "Aperte M para voltar ao MENU!");
             gl.glPopMatrix();
                 gl.glLineWidth(10.0f);
                 gl.glColor3f(1f, 0f, 0f);
@@ -140,12 +143,6 @@ public class Cena implements GLEventListener{
     }
 
     public void fase1() {
-        if (!pause) {
-            bolaMove();
-        }
-        else {
-            desenhaTexto(gl, 500, 600, Color.WHITE , "JOGO PAUSADO");
-        }
 
         // Desenha a Barra
         gl.glPushMatrix();
@@ -157,6 +154,15 @@ public class Cena implements GLEventListener{
         gl.glTranslatef(0, 0, 0);
         criaBola();
         gl.glPopMatrix();
+
+        if (!pause) {
+            bolaMove();
+        }
+        else {
+            desenhaTextoEspecifico(gl, 450, 500, Color.WHITE , "JOGO PAUSADO", 50);
+            desenhaTexto(gl, 500, 350, Color.WHITE, "Aperte R para RECOMEÇAR!");
+            desenhaTexto(gl, 500, 300, Color.WHITE, "Aperte M para voltar ao MENU!");
+        }
 
         // Desenha barra de Vida
         gl.glPushMatrix();
@@ -388,7 +394,7 @@ public class Cena implements GLEventListener{
     public void init(GLAutoDrawable drawable) {
         //dados iniciais da cena
         gl = drawable.getGL().getGL2();
-        textRenderer = new TextRenderer(new Font("Fixedsys Regular", Font.BOLD,30));
+        textRenderer = new TextRenderer(new Font("Castellar", Font.BOLD,20));
         randomBola();
     }
 
