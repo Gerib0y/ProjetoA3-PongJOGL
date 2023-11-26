@@ -9,7 +9,6 @@ import java.util.Locale;
 
 public class Cena implements GLEventListener{
     private GL2 gl;
-    //private GLUT glut;
     private int toning = GL2.GL_SMOOTH;
     private float aspect;
     private TextRenderer textRenderer;
@@ -23,15 +22,14 @@ public class Cena implements GLEventListener{
     public float moveBarra = 0;
     public int score = 0;
     public int vidas = 5;
+    public boolean pause = false;
 
     public void resetData() {
         bolaX = 0;
         bolaY = 1f;
         direcaoY = 'd';
-
-        //isGamePaused = false;
+        pause = false;
         op = 0;
-
         moveBarra = 0;
         score = 0;
         vidas = 5;
@@ -46,12 +44,12 @@ public class Cena implements GLEventListener{
         // Limpa a janela com a cor especificada
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
         gl.glLoadIdentity(); // Lê a matriz identidade
-        //glut = new GLUT();
 
         switch (op) {
             case 0:
                 menu();
                 break;
+
             case 1:
                 fase1();
                 if (score == 40){
@@ -60,22 +58,22 @@ public class Cena implements GLEventListener{
                 if (vidas < 1){
                     op = 3;
                 }
-
                 break;
+
             case 2:
                 gl.glClearColor(0,0.3f,0.3f,1);
                 gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
                 fase1();
                 gl.glPushMatrix();
-                    obstaculo();
+                obstaculo();
                 gl.glPopMatrix();
                 velocidade += 0.00001f;
 
                 if (vidas < 1){
                     op = 3;
                 }
-
                 break;
+
             case 3:
                 gl.glClearColor(0, 0, 0, 1);
                 gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
@@ -84,8 +82,8 @@ public class Cena implements GLEventListener{
                 break;
             case 4:
                 comandos();
-
                 break;
+
             default:
 
                 break;
@@ -101,13 +99,13 @@ public class Cena implements GLEventListener{
             desenhaTexto(gl, 50, 350, Color.WHITE, "Aperte 2 para acessar os CRÉDITOS");
             desenhaTextoEspecifico(gl, 410, 150, Color.GREEN, "Aperte S para INICIAR!", 50);
         gl.glPopMatrix();
-        gl.glLineWidth(10.0f);
-        gl.glColor3f(0f, 1f, 1f);
-        gl.glBegin(GL2.GL_LINE_LOOP);
-        gl.glVertex2f(-1f, -0.9999f);
-        gl.glVertex2f(1, -1);
-        gl.glVertex2f(1, 1);
-        gl.glVertex2f(-0.9999f, 1);
+            gl.glLineWidth(10.0f);
+            gl.glColor3f(0f, 1f, 1f);
+            gl.glBegin(GL2.GL_LINE_LOOP);
+            gl.glVertex2f(-1f, -0.9999f);
+            gl.glVertex2f(1, -1);
+            gl.glVertex2f(1, 1);
+            gl.glVertex2f(-0.9999f, 1);
         gl.glEnd();
     }
 
@@ -129,27 +127,29 @@ public class Cena implements GLEventListener{
                 desenhaTexto(gl, 320, 350, Color.WHITE, "Aperte R para RECOMEÇAR!");
                 desenhaTexto(gl, 320, 300, Color.WHITE, "Aperte M para voltar ao MENU!");
             gl.glPopMatrix();
-            gl.glPopMatrix();
-            gl.glLineWidth(10.0f);
-            gl.glColor3f(1f, 0f, 0f);
+                gl.glLineWidth(10.0f);
+                gl.glColor3f(1f, 0f, 0f);
             gl.glBegin(GL2.GL_LINE_LOOP);
-            gl.glVertex2f(-1f, -0.9999f);
-            gl.glVertex2f(1, -1);
-            gl.glVertex2f(1, 1);
-            gl.glVertex2f(-0.9999f, 1);
+                gl.glVertex2f(-1f, -0.9999f);
+                gl.glVertex2f(1, -1);
+                gl.glVertex2f(1, 1);
+                gl.glVertex2f(-0.9999f, 1);
             gl.glEnd();
         }
         return true;
     }
 
     public void fase1() {
+        if (!pause) {
+            bolaMove();
+        }
+        else {
+            desenhaTexto(gl, 500, 600, Color.WHITE , "JOGO PAUSADO");
+        }
+
         // Desenha a Barra
         gl.glPushMatrix();
         criaRetangulo();
-        gl.glPopMatrix();
-
-        gl.glPushMatrix();
-        criaVida();
         gl.glPopMatrix();
 
         // Desenha a Bola
@@ -157,8 +157,13 @@ public class Cena implements GLEventListener{
         gl.glTranslatef(0, 0, 0);
         criaBola();
         gl.glPopMatrix();
-        bolaMove();
-        desenhaTexto(gl, 900, 670, Color.WHITE, "Almas " + score);
+
+        // Desenha barra de Vida
+        gl.glPushMatrix();
+        criaVida();
+        gl.glPopMatrix();
+
+        desenhaTexto(gl, 1120, 670, Color.WHITE, "Almas " + score);
         //desenhaTexto(gl, 20, 670, Color.WHITE, "Vidas:" + vidas);
     }
 
@@ -190,11 +195,11 @@ public class Cena implements GLEventListener{
         gl.glPushMatrix();
             gl.glTranslatef(moveBarra, 0, 0);
             gl.glBegin(GL2.GL_QUADS);
-                gl.glColor3f(0f, 1f, 1f);
+                gl.glColor3f(0.5f, 0.5f, 0.5f);
                 gl.glVertex2f(-0.2f, -0.8f);
-                gl.glColor3f(0.0f, 0.0f, 0.0f);
+                gl.glColor3f(0f, 0f, 0f);
                 gl.glVertex2f(0.2f, -0.8f);
-                gl.glColor3f(0.0f, 1f, 1f);
+                gl.glColor3f(0.5f, 0.5f, 0.5f);
                 gl.glVertex2f(0.2f, -0.9f);
                 gl.glColor3f(0.0f, 0.0f, 0.0f);
                 gl.glVertex2f(-0.2f, -0.9f);
@@ -245,7 +250,7 @@ public class Cena implements GLEventListener{
                 gl.glVertex2f(-0.9f,0.95f);
             gl.glEnd();
 
-            // Move para a próxima posição de vida
+            // Tira uma parte da barra da vida
             gl.glTranslatef(0.1f, 0, 0);
         }
     }
@@ -326,8 +331,7 @@ public class Cena implements GLEventListener{
 //            direcaoY = 'u';
 //        }
         // Colisão com a plataforma
-        if (yTransBallFixed == -0.7f && direcaoY == 'd'
-                && colisaoBolaBarra(xTransBallFixed)) {
+        if (yTransBallFixed == -0.7f && direcaoY == 'd' && colisaoBolaBarra(xTransBallFixed)) {
             direcaoY = 'u';
             //lightOn = false;
             toning = toning == GL2.GL_SMOOTH ? GL2.GL_FLAT : GL2.GL_SMOOTH;

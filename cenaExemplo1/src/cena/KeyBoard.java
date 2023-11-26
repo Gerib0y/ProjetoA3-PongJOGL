@@ -13,44 +13,51 @@ public abstract class KeyBoard implements KeyListener {
     public void keyPressed(KeyEvent e) {
         System.out.println("Key pressed: " + e.getKeyCode());
 
-        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            System.exit(0);
-        }
-
         switch (e.getKeyCode()) {
+            case KeyEvent.VK_ESCAPE:
+                System.exit(0);
+                break;
+
             case KeyEvent.VK_RIGHT:
-                if (cena.moveBarra < 0.8) {
+                if (cena.moveBarra < 0.7 && !cena.pause) {
                     cena.moveBarra = cena.moveBarra + 0.2f;
                 }
                 break;
+
             case KeyEvent.VK_LEFT:
-                if (cena.moveBarra > -0.8) {
+                if (cena.moveBarra > -0.7 && !cena.pause) {
                     cena.moveBarra = cena.moveBarra - 0.2f;
                 }
                 break;
-        }
-        switch (e.getKeyChar()){
-            case 'm':
+
+            case KeyEvent.VK_M:
                 cena.resetData();
                 cena.op = 0;
                 break;
-            case 's':
+
+            case KeyEvent.VK_S:
                 if (cena.op != 4 && cena.op != 3) {
                     cena.op = 1;
                 }
                 break;
-            case 'r':
+
+            case KeyEvent.VK_R:
                 if (cena.op !=0 && cena.op != 4) {
                     cena.resetData();
                     cena.op = 1;
                 }
                 break;
-            case '1':
+
+            case KeyEvent.VK_1:
                 if (cena.op == 0) {
                 cena.op = 4;
             }
             break;
 
+            case KeyEvent.VK_P:
+                if (cena.op !=4 && cena.op !=0 ){
+                    cena.pause = !cena.pause;
+                }
         }
     }
 
