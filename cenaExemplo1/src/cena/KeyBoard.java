@@ -31,8 +31,10 @@ public abstract class KeyBoard implements KeyListener {
                 break;
 
             case KeyEvent.VK_M:
-                cena.resetData();
-                cena.op = 0;
+                if (cena.pause || cena.op == 4 || cena.op == 3) {
+                    cena.resetData();
+                    cena.op = 0;
+                }
                 break;
 
             case KeyEvent.VK_S:

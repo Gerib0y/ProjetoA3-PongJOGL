@@ -6,6 +6,7 @@ import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.util.awt.TextRenderer;
 import java.awt.*;
 import java.util.Locale;
+import com.jogamp.opengl.util.texture.Texture;
 
 public class Cena implements GLEventListener{
     private GL2 gl;
@@ -23,6 +24,10 @@ public class Cena implements GLEventListener{
     public int score = 0;
     public int vidas = 5;
     public boolean pause = false;
+    private Texture txtmenu;
+    private Texture txtcj;
+    private Texture txtgo;
+    private Texture txtf1;
 
     public void resetData() {
         bolaX = 0;
@@ -51,6 +56,7 @@ public class Cena implements GLEventListener{
                 break;
 
             case 1:
+                fundof1();
                 fase1();
                 if (score == 40){
                     op = 2;
@@ -75,13 +81,10 @@ public class Cena implements GLEventListener{
                 break;
 
             case 3:
-                gl.glClearColor(0, 0, 0, 1);
-                gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
                 gameOver();
-
                 break;
             case 4:
-                comandos();
+                fundoCJ();
                 break;
 
             default:
@@ -93,50 +96,19 @@ public class Cena implements GLEventListener{
     }
 
     public void menu() {
+        fundoMenu();
         gl.glPushMatrix();
-            desenhaTextoEspecifico(gl, 360, 360, Color.WHITE, "Pong Souls",110);
-            desenhaTexto(gl, 560, 200, Color.WHITE, "1 - COMO JOGAR");
-            desenhaTexto(gl, 560, 150, Color.WHITE, "2 - CRÉDITOS");
-            desenhaTexto(gl, 540, 50, Color.WHITE, "Aperte S para INICIAR!");
+            desenhaTexto(gl, 500, 50, Color.WHITE, "Aperte S para INICIAR!");
         gl.glPopMatrix();
-            gl.glLineWidth(10.0f);
-            gl.glColor3f(1f, 1f, 1f);
-            gl.glBegin(GL2.GL_LINE_LOOP);
-            gl.glVertex2f(-1f, -0.9999f);
-            gl.glVertex2f(1, -1);
-            gl.glVertex2f(1, 1);
-            gl.glVertex2f(-0.9999f, 1);
         gl.glEnd();
-    }
-
-    public void comandos() {
-        gl.glPushMatrix();
-            desenhaTextoEspecifico(gl, 380, 650, Color.WHITE, "COMO JOGAR", 80);
-            desenhaTexto(gl, 50, 500, Color.WHITE, "← - MOVE A BARRA PARA A ESQUERDA");
-            desenhaTexto(gl, 50, 450, Color.WHITE, "→ - MOVE A BARRA PARA A DIREITA");
-            desenhaTexto(gl, 50, 400, Color.WHITE, "R - RECOMEÇA O JOGO");
-            desenhaTexto(gl, 50, 350, Color.WHITE, "A BARRA              REPRESENTA 5 VIDAS,");
-            desenhaTexto(gl, 50, 300, Color.WHITE, "QUANDO ELA CHEGA AO FINAL O JOGO");
-            desenhaTexto(gl, 50, 250, Color.WHITE, "ACABA");
-            desenhaTexto(gl, 50, 20, Color.WHITE, "M - PARA VOLTAR AO MENU");
-        gl.glPopMatrix();
     }
 
     public boolean gameOver(){
         if (vidas <= 0) {
+            fundogo();
             gl.glPushMatrix();
-                desenhaTextoEspecifico(gl, 380, 400, Color.RED, "VOCÊ PERDEU", 80);
-                desenhaTexto(gl, 500, 300, Color.WHITE, "Seu Score total foi de: " + score);
-                desenhaTexto(gl, 500, 250, Color.WHITE, "Aperte R para RECOMEÇAR!");
-                desenhaTexto(gl, 500, 200, Color.WHITE, "Aperte M para voltar ao MENU!");
+                desenhaTexto(gl, 500, 225, Color.WHITE, "Almas coletadas " + score);
             gl.glPopMatrix();
-                gl.glLineWidth(10.0f);
-                gl.glColor3f(1f, 0f, 0f);
-            gl.glBegin(GL2.GL_LINE_LOOP);
-                gl.glVertex2f(-1f, -0.9999f);
-                gl.glVertex2f(1, -1);
-                gl.glVertex2f(1, 1);
-                gl.glVertex2f(-0.9999f, 1);
             gl.glEnd();
         }
         return true;
@@ -259,6 +231,110 @@ public class Cena implements GLEventListener{
             // Tira uma parte da barra da vida
             gl.glTranslatef(0.1f, 0, 0);
         }
+    }
+
+    public void fundoMenu() {
+
+        gl.glEnable(GL2.GL_TEXTURE_2D);
+        txtmenu.enable(gl);
+        txtmenu.bind(gl);
+
+        // Desenhar o objeto
+        gl.glBegin(GL2.GL_QUADS);
+        gl.glTexCoord2f(0.0f, 0.0f);
+        gl.glVertex2f(-1.0f, -1.0f);
+
+        gl.glTexCoord2f(1.0f, 0.0f);
+        gl.glVertex2f(1.0f, -1.0f);
+
+        gl.glTexCoord2f(1.0f, 1.0f);
+        gl.glVertex2f(1.0f, 1.0f);
+
+        gl.glTexCoord2f(0.0f, 1.0f);
+        gl.glVertex2f(-1.0f, 1.0f);
+        gl.glEnd();
+
+        // Desativar a textura
+        txtmenu.disable(gl);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+    }
+
+    public void fundoCJ() {
+
+        gl.glEnable(GL2.GL_TEXTURE_2D);
+        txtcj.enable(gl);
+        txtcj.bind(gl);
+
+        // Desenhar o objeto
+        gl.glBegin(GL2.GL_QUADS);
+        gl.glTexCoord2f(0.0f, 0.0f);
+        gl.glVertex2f(-1.0f, -1.0f);
+
+        gl.glTexCoord2f(1.0f, 0.0f);
+        gl.glVertex2f(1.0f, -1.0f);
+
+        gl.glTexCoord2f(1.0f, 1.0f);
+        gl.glVertex2f(1.0f, 1.0f);
+
+        gl.glTexCoord2f(0.0f, 1.0f);
+        gl.glVertex2f(-1.0f, 1.0f);
+        gl.glEnd();
+
+        // Desativar a textura
+        txtcj.disable(gl);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+    }
+
+    public void fundof1() {
+
+        gl.glEnable(GL2.GL_TEXTURE_2D);
+        txtf1.enable(gl);
+        txtf1.bind(gl);
+
+        // Desenhar o objeto
+        gl.glBegin(GL2.GL_QUADS);
+        gl.glTexCoord2f(0.0f, 0.0f);
+        gl.glVertex2f(-1.0f, -1.0f);
+
+        gl.glTexCoord2f(1.0f, 0.0f);
+        gl.glVertex2f(1.0f, -1.0f);
+
+        gl.glTexCoord2f(1.0f, 1.0f);
+        gl.glVertex2f(1.0f, 1.0f);
+
+        gl.glTexCoord2f(0.0f, 1.0f);
+        gl.glVertex2f(-1.0f, 1.0f);
+        gl.glEnd();
+
+        // Desativar a textura
+        txtf1.disable(gl);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+    }
+
+    public void fundogo() {
+
+        gl.glEnable(GL2.GL_TEXTURE_2D);
+        txtgo.enable(gl);
+        txtgo.bind(gl);
+
+        // Desenhar o objeto
+        gl.glBegin(GL2.GL_QUADS);
+        gl.glTexCoord2f(0.0f, 0.0f);
+        gl.glVertex2f(-1.0f, -1.0f);
+
+        gl.glTexCoord2f(1.0f, 0.0f);
+        gl.glVertex2f(1.0f, -1.0f);
+
+        gl.glTexCoord2f(1.0f, 1.0f);
+        gl.glVertex2f(1.0f, 1.0f);
+
+        gl.glTexCoord2f(0.0f, 1.0f);
+        gl.glVertex2f(-1.0f, 1.0f);
+        gl.glEnd();
+
+        // Desativar a textura
+        txtgo.disable(gl);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
     public void randomBola() {
@@ -394,8 +470,15 @@ public class Cena implements GLEventListener{
     public void init(GLAutoDrawable drawable) {
         //dados iniciais da cena
         gl = drawable.getGL().getGL2();
-        textRenderer = new TextRenderer(new Font("Castellar", Font.BOLD,20));
+        textRenderer = new TextRenderer(new Font("Castellar", Font.BOLD,25));
         randomBola();
+        GL2 gl = drawable.getGL().getGL2();
+
+        // Carrega a textura usando a classe Textura
+        txtmenu = Textura.loadTexture(gl, "src/texturas/pong_souls.jpg");
+        txtcj = Textura.loadTexture(gl, "src/texturas/como_jogar.jpg");
+        txtgo = Textura.loadTexture(gl, "src/texturas/gameover.jpg");
+        txtf1 = Textura.loadTexture(gl, "src/texturas/fundo_fase_1pb.jpg");
     }
 
     @Override
