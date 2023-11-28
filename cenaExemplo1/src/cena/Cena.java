@@ -15,7 +15,9 @@ public class Cena implements GLEventListener{
     private TextRenderer textRenderer;
     private Texture txtmenu; // Textura menu
     private Texture txtcj; // Textura como jogar
+    private Texture txtcred; // Textura créditos
     private Texture txtgo; // Textura game over
+    private Texture txtfim; // Textura tela final
     private Texture txtf1; // Textura fase 1
     private Texture txtf2; // Textura fase 2
     public int mode;
@@ -62,7 +64,7 @@ public class Cena implements GLEventListener{
             case 1:
                 fundoF1();
                 fase1();
-                if (score == 40){
+                if (score == 200){
                     op = 2;
                 }
                 if (vidas < 1){
@@ -73,20 +75,35 @@ public class Cena implements GLEventListener{
             case 2:
                 fundoF2();
                 fase1();
-//                gl.glPushMatrix();
-//                gl.glPopMatrix();
+
+                gl.glPushMatrix();
+                obstaculo(gl);
+                gl.glPopMatrix();
                 velocidade += 0.00001f;
 
                 if (vidas < 1){
                     op = 3;
+                }
+                if (score == 400)
+                {
+                    op = 6;
                 }
                 break;
 
             case 3:
                 gameOver();
                 break;
+
             case 4:
                 fundoCJ();
+                break;
+
+            case 5:
+                fundoCred();
+                break;
+
+            case 6:
+                telaFim();
                 break;
 
             default:
@@ -118,6 +135,15 @@ public class Cena implements GLEventListener{
         return true;
     }
 
+    public void telaFim() {
+            fundoFim();
+            gl.glPushMatrix();
+            desenhaTexto(gl, 480, 225, Color.WHITE, "Almas coletadas " + score);
+            desenhaTextoSuave(gl, 450, 50, Color.WHITE, "Aperte 2 para continuar");
+            gl.glPopMatrix();
+            gl.glEnd();
+    }
+
     public void fase1() {
 
         // Desenha a Barra
@@ -135,7 +161,7 @@ public class Cena implements GLEventListener{
             bolaMove();
         }
         else {
-            desenhaTextoEspecifico(gl, 440, 500, Color.WHITE , "Jogo Pausado", 70);
+            desenhaTextoEspecifico(gl, 440, 500, Color.WHITE , "jogo pausado", 70);
             desenhaTexto(gl, 460, 350, Color.WHITE, "Aperte R para RECOMEÇAR");
             desenhaTexto(gl, 410, 300, Color.WHITE, "Aperte M para voltar ao MENU");
         }
@@ -222,6 +248,23 @@ public class Cena implements GLEventListener{
         }
     }
 
+    public void obstaculo(GL2 gl) {
+        gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_LINE);  // Definir para desenhar apenas o contorno
+
+        gl.glBegin(GL2.GL_QUADS);
+        gl.glColor3f(1.0f, 1.0f, 1.0f);  // Cor do contorno (branco)
+
+        gl.glVertex2f(-0.19f, 0.55f);
+        gl.glVertex2f(0.19f, 0.55f);
+        gl.glVertex2f(0.19f, -0.15f);
+        gl.glVertex2f(-0.19f, -0.15f);
+
+        gl.glEnd();
+
+        gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_FILL);  // Restaurar para o modo de preenchimento
+    }
+
+
     public void fundoMenu() {
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
@@ -271,6 +314,32 @@ public class Cena implements GLEventListener{
 
         // Desativar a textura
         txtcj.disable(gl);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+    }
+
+    public void fundoCred ()  {
+
+        gl.glEnable(GL2.GL_TEXTURE_2D);
+        txtcred.enable(gl);
+        txtcred.bind(gl);
+
+        // Desenhar o objeto
+        gl.glBegin(GL2.GL_QUADS);
+        gl.glTexCoord2f(0.0f, 0.0f);
+        gl.glVertex2f(-1.0f, -1.0f);
+
+        gl.glTexCoord2f(1.0f, 0.0f);
+        gl.glVertex2f(1.0f, -1.0f);
+
+        gl.glTexCoord2f(1.0f, 1.0f);
+        gl.glVertex2f(1.0f, 1.0f);
+
+        gl.glTexCoord2f(0.0f, 1.0f);
+        gl.glVertex2f(-1.0f, 1.0f);
+        gl.glEnd();
+
+        // Desativar a textura
+        txtcred.disable(gl);
         gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
@@ -352,6 +421,32 @@ public class Cena implements GLEventListener{
         gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
+    public void fundoFim() {
+
+        gl.glEnable(GL2.GL_TEXTURE_2D);
+        txtfim.enable(gl);
+        txtfim.bind(gl);
+
+        // Desenhar o objeto
+        gl.glBegin(GL2.GL_QUADS);
+        gl.glTexCoord2f(0.0f, 0.0f);
+        gl.glVertex2f(-1.0f, -1.0f);
+
+        gl.glTexCoord2f(1.0f, 0.0f);
+        gl.glVertex2f(1.0f, -1.0f);
+
+        gl.glTexCoord2f(1.0f, 1.0f);
+        gl.glVertex2f(1.0f, 1.0f);
+
+        gl.glTexCoord2f(0.0f, 1.0f);
+        gl.glVertex2f(-1.0f, 1.0f);
+        gl.glEnd();
+
+        // Desativar a textura
+        txtfim.disable(gl);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+    }
+
     public void randomBola() {
         double xRandom = -0.8f + Math.random() * 1.6f;
         if (xRandom > 0) {
@@ -396,14 +491,14 @@ public class Cena implements GLEventListener{
         float yTransBallFixed = Float.valueOf(String.format(Locale.US, "%.1f", bolaY));
 
         // Colisão com objeto da fase 2
-//        if (op == 2 && direcaoX == 'l'
-//                && colisaoBolaY(xTransBallFixed, yTransBallFixed, -0.1f, 0.5f, 0.2f)) {
-//            direcaoX = 'r';
-//        }
-//        if (op == 2 && direcaoX == 'r'
-//                && colisaoBolaY(xTransBallFixed, yTransBallFixed, -0.1f, 0.5f, -0.2f)) {
-//            direcaoX = 'l';
-//        }
+        if (op == 2 && direcaoX == 'l'
+                && colisaoBolaY(xTransBallFixed, yTransBallFixed, -0.1f, 0.5f, 0.2f)) {
+            direcaoX = 'r';
+        }
+        if (op == 2 && direcaoX == 'r'
+                && colisaoBolaY(xTransBallFixed, yTransBallFixed, -0.1f, 0.5f, -0.2f)) {
+            direcaoX = 'l';
+        }
         // Colisão com a plataforma
         if (xTransBallFixed > -1f && direcaoX == 'l') {
             bolaX -= velocidade/2;
@@ -419,14 +514,14 @@ public class Cena implements GLEventListener{
         }
 
         // Colisão com objeto da fase 2
-//        if (op == 2 && direcaoY == 'u'
-//                && colisaoBolaX(xTransBallFixed, yTransBallFixed, -0.2f, 0.2f, -0.2f)) {
-//            direcaoY = 'd';
-//        }
-//        else if (op == 2 && direcaoY == 'd'
-//                && colisaoBolaX(xTransBallFixed, yTransBallFixed, -0.2f, 0.2f, 0.6f)) {
-//            direcaoY = 'u';
-//        }
+        if (op == 2 && direcaoY == 'u'
+                && colisaoBolaX(xTransBallFixed, yTransBallFixed, -0.2f, 0.2f, -0.2f)) {
+            direcaoY = 'd';
+        }
+        else if (op == 2 && direcaoY == 'd'
+                && colisaoBolaX(xTransBallFixed, yTransBallFixed, -0.2f, 0.2f, 0.6f)) {
+            direcaoY = 'u';
+        }
         // Colisão com a plataforma
         if (yTransBallFixed == -0.7f && direcaoY == 'd' && colisaoBolaBarra(xTransBallFixed)) {
             direcaoY = 'u';
@@ -507,7 +602,9 @@ public class Cena implements GLEventListener{
         // Carrega a textura usando a classe Textura
         txtmenu = Textura.loadTexture(gl, "src/texturas/pong_souls.jpg");
         txtcj = Textura.loadTexture(gl, "src/texturas/como_jogar.jpg");
+        txtcred = Textura.loadTexture(gl, "src/texturas/creditos.jpg");
         txtgo = Textura.loadTexture(gl, "src/texturas/gameover.jpg");
+        txtfim = Textura.loadTexture(gl, "src/texturas/final.jpg");
         txtf1 = Textura.loadTexture(gl, "src/texturas/fundo_fase_1.jpg");
         txtf2 = Textura.loadTexture(gl, "src/texturas/fundo_fase_2.jpg");
     }
