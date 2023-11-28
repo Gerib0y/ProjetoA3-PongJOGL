@@ -13,8 +13,14 @@ public class Cena implements GLEventListener{
     private int toning = GL2.GL_SMOOTH;
     private float aspect;
     private TextRenderer textRenderer;
-    public int mode; // Menu
-    public int op = 0; // Menu
+    private Texture txtmenu; // Textura menu
+    private Texture txtcj; // Textura como jogar
+    private Texture txtgo; // Textura game over
+    private Texture txtf1; // Textura fase 1
+    private Texture txtf2; // Textura fase 2
+    public int mode;
+    private long tempoInicial;
+    public int op = 0;
     private float bolaX = 0;
     private float bolaY = 1f;
     private char direcaoX;
@@ -24,18 +30,16 @@ public class Cena implements GLEventListener{
     public int score = 0;
     public int vidas = 5;
     public boolean pause = false;
-    private Texture txtmenu;
-    private Texture txtcj;
-    private Texture txtgo;
-    private Texture txtf1;
+    private boolean textoVisivel = true;
 
     public void resetData() {
         bolaX = 0;
         bolaY = 1f;
         direcaoY = 'd';
         pause = false;
-        op = 0;
         moveBarra = 0;
+        op = 0;
+        velocidade = 0.02f;
         score = 0;
         vidas = 5;
     }
@@ -56,7 +60,7 @@ public class Cena implements GLEventListener{
                 break;
 
             case 1:
-                fundof1();
+                fundoF1();
                 fase1();
                 if (score == 40){
                     op = 2;
@@ -67,12 +71,10 @@ public class Cena implements GLEventListener{
                 break;
 
             case 2:
-                gl.glClearColor(0,0.3f,0.3f,1);
-                gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
+                fundoF2();
                 fase1();
-                gl.glPushMatrix();
-                obstaculo();
-                gl.glPopMatrix();
+//                gl.glPushMatrix();
+//                gl.glPopMatrix();
                 velocidade += 0.00001f;
 
                 if (vidas < 1){
@@ -98,16 +100,18 @@ public class Cena implements GLEventListener{
     public void menu() {
         fundoMenu();
         gl.glPushMatrix();
-            desenhaTexto(gl, 500, 50, Color.WHITE, "Aperte S para INICIAR!");
+        if(textoVisivel) {
+            desenhaTextoSuave(gl, 470, 50, Color.WHITE, "Aperte S para INICIAR!");
+        }
         gl.glPopMatrix();
         gl.glEnd();
     }
 
     public boolean gameOver(){
         if (vidas <= 0) {
-            fundogo();
+            fundoGo();
             gl.glPushMatrix();
-                desenhaTexto(gl, 500, 225, Color.WHITE, "Almas coletadas " + score);
+                desenhaTexto(gl, 480, 225, Color.WHITE, "Almas coletadas " + score);
             gl.glPopMatrix();
             gl.glEnd();
         }
@@ -131,9 +135,9 @@ public class Cena implements GLEventListener{
             bolaMove();
         }
         else {
-            desenhaTextoEspecifico(gl, 450, 500, Color.WHITE , "JOGO PAUSADO", 50);
-            desenhaTexto(gl, 500, 350, Color.WHITE, "Aperte R para RECOMEÇAR!");
-            desenhaTexto(gl, 500, 300, Color.WHITE, "Aperte M para voltar ao MENU!");
+            desenhaTextoEspecifico(gl, 440, 500, Color.WHITE , "Jogo Pausado", 70);
+            desenhaTexto(gl, 460, 350, Color.WHITE, "Aperte R para RECOMEÇAR");
+            desenhaTexto(gl, 410, 300, Color.WHITE, "Aperte M para voltar ao MENU");
         }
 
         // Desenha barra de Vida
@@ -141,8 +145,7 @@ public class Cena implements GLEventListener{
         criaVida();
         gl.glPopMatrix();
 
-        desenhaTexto(gl, 1120, 670, Color.WHITE, "Almas " + score);
-        //desenhaTexto(gl, 20, 670, Color.WHITE, "Vidas:" + vidas);
+        desenhaTexto(gl, 1110, 670, Color.WHITE, "Almas " + score);
     }
 
     public void desenhaTexto(GL2 gl, int xPosicao, int yPosicao, Color cor, String frase){
@@ -153,20 +156,6 @@ public class Cena implements GLEventListener{
         textRenderer.draw(frase, xPosicao, yPosicao);
         textRenderer.endRendering();
         gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, mode);
-    }
-
-    public void obstaculo(){
-        gl.glPushMatrix();
-        gl.glBegin(GL2.GL_TRIANGLES);
-            gl.glColor3f(1, 1, 1);
-            gl.glVertex2f(-0.7f,0.7f );
-            gl.glVertex2f(-0.8f,0.5f);
-            gl.glVertex2f(-0.6f,0.5f);
-            gl.glVertex2f(0.7f, 0.7f);
-            gl.glVertex2f(0.8f,0.5f);
-            gl.glVertex2f(0.6f, 0.5f);
-        gl.glEnd();
-        gl.glPopMatrix();
     }
 
     public void criaRetangulo(){
@@ -285,7 +274,7 @@ public class Cena implements GLEventListener{
         gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
-    public void fundof1() {
+    public void fundoF1() {
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
         txtf1.enable(gl);
@@ -311,7 +300,33 @@ public class Cena implements GLEventListener{
         gl.glDisable(GL2.GL_TEXTURE_2D);
     }
 
-    public void fundogo() {
+    public void fundoF2() {
+
+        gl.glEnable(GL2.GL_TEXTURE_2D);
+        txtf2.enable(gl);
+        txtf2.bind(gl);
+
+        // Desenhar o objeto
+        gl.glBegin(GL2.GL_QUADS);
+        gl.glTexCoord2f(0.0f, 0.0f);
+        gl.glVertex2f(-1.0f, -1.0f);
+
+        gl.glTexCoord2f(1.0f, 0.0f);
+        gl.glVertex2f(1.0f, -1.0f);
+
+        gl.glTexCoord2f(1.0f, 1.0f);
+        gl.glVertex2f(1.0f, 1.0f);
+
+        gl.glTexCoord2f(0.0f, 1.0f);
+        gl.glVertex2f(-1.0f, 1.0f);
+        gl.glEnd();
+
+        // Desativar a textura
+        txtf2.disable(gl);
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+    }
+
+    public void fundoGo() {
 
         gl.glEnable(GL2.GL_TEXTURE_2D);
         txtgo.enable(gl);
@@ -438,6 +453,19 @@ public class Cena implements GLEventListener{
         }
     }
 
+    private void desenhaTextoSuave(GL2 gl, int xPosicao, int yPosicao, Color cor, String frase) {
+        long tempoAtual = System.currentTimeMillis();
+        long tempoPassado = tempoAtual - tempoInicial;
+
+        float alpha = (float) Math.abs(Math.sin(tempoPassado / 1300.0)); // Ajuste a frequência aqui
+
+        // Configura a cor com a intensidade alpha
+        cor = new Color(cor.getRed(), cor.getGreen(), cor.getBlue(), (int) (alpha * 255));
+        desenhaTexto(gl, xPosicao, yPosicao, cor, frase);
+
+        gl.glColor4f(1f, 1f, 1f, 1f);
+    }
+
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width , int height) {
         //obtem o contexto grafico Opengl
@@ -455,10 +483,10 @@ public class Cena implements GLEventListener{
         System.out.println("Reshape: " + width + ", " + height);
     }
 
-    // Funçao para mudar tamanho de TEXTO ESPECÍFICOS
+    // Função para mudar tamanho de um TEXTO ESPECÍFICOS
     public void desenhaTextoEspecifico(GL2 gl, int xPosicao, int yPosicao, Color cor, String frase, int tamanhoFonte) {
         gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_FILL);
-        TextRenderer textRendererEspecifico = new TextRenderer(new Font("Fixedsys Regular", Font.BOLD, tamanhoFonte));
+        TextRenderer textRendererEspecifico = new TextRenderer(new Font("OptimusPrinceps", Font.BOLD, tamanhoFonte));
         textRendererEspecifico.beginRendering(Renderer.screenWidth, Renderer.screenHeight);
         textRendererEspecifico.setColor(cor);
         textRendererEspecifico.draw(frase, xPosicao, yPosicao);
@@ -468,17 +496,20 @@ public class Cena implements GLEventListener{
 
     @Override
     public void init(GLAutoDrawable drawable) {
-        //dados iniciais da cena
+        // Dados iniciais da cena
         gl = drawable.getGL().getGL2();
         textRenderer = new TextRenderer(new Font("Castellar", Font.BOLD,25));
         randomBola();
-        GL2 gl = drawable.getGL().getGL2();
+
+        // temporizador de texto
+        tempoInicial = System.currentTimeMillis();
 
         // Carrega a textura usando a classe Textura
         txtmenu = Textura.loadTexture(gl, "src/texturas/pong_souls.jpg");
         txtcj = Textura.loadTexture(gl, "src/texturas/como_jogar.jpg");
         txtgo = Textura.loadTexture(gl, "src/texturas/gameover.jpg");
-        txtf1 = Textura.loadTexture(gl, "src/texturas/fundo_fase_1pb.jpg");
+        txtf1 = Textura.loadTexture(gl, "src/texturas/fundo_fase_1.jpg");
+        txtf2 = Textura.loadTexture(gl, "src/texturas/fundo_fase_2.jpg");
     }
 
     @Override
